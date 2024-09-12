@@ -24,14 +24,41 @@ jobs:
 
       - name: Deploy WAR to EC2
         env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_KEY: ${{ secrets.EC2_KEY }}
+          EC2_HOST: "54.163.15.193"  # Your EC2 instance public IP
+          EC2_USER: "ec2-user"       # Your SSH username (e.g., "ec2-user" or "ubuntu")
+          EC2_KEY: |                 # Your SSH private key in PEM format
+            -----BEGIN RSA PRIVATE KEY-----
+            MIIEpQIBAAKCAQEAmvU/y4nUlBvRi7lcdPPPHdFkzodKNox6zQld47JXM9zR2Gkv
+            EIKb3ZeVR64PhnAD/v8mosE0jCTKCB3aNizR4Nom/FSzGZF8fMwRgj94ke0PHqGr
+            NIKTHVCMK3Vx25TEkitcOaCMHdCZkfR0FI4wvPBxNYnc/Z8KJeO9f+2WqL1BUx7f
+            xGo+bKq7jtt3h+KkdrIiTIh1bQQxeS4FJeWPiotCwoCpZa1Rf1VZyb2OqEIpH+f4
+            wQ67G/op2KzWKBF+S9QbTSy967DvNfac2byYLctfEGHfFzeHPZHpi3A2tQEQl0CH
+            bEYWddDncA8zzrXaDvw68QRNx3d6UWDpCjZfFQIDAQABAoIBADKpqoDugF0oNzua
+            j/sA15+lHXNU0lPBXEj7HgJbBZ3EPaumwCeCvFkXvUvhQdwvdW8CluwxhO+o+5Dp
+            ybVatAfy6zomqyPZ6DyZL8RI4i+7tOzL6MDTTCwScLGoxWAIZLhxisagkg8Ra5RH
+            u0gZMSAk8K6Tc3hMbjHzIrrXwCFMsS2hTBvLG4nXydoKUwh1fcHHlzQhWpgWCWAC
+            VtY1mLzcNfeh673g/b2J8FUrvPjWXPGxeH8BvN69KsN+HeZuCazUFpWdVqed5Aqq
+            OWsoPFl6hOpaDJBSSj25o0ldB3tDxwfH0swcdnyE/BXMlvnHzTYf2vwqct8eD6mY
+            8Qj03CUCgYEA/WY+uOveA+oJfL813HrAx/sLKWILADzEpRS6eJrUTBEzRP131QRd
+            Qqv/BVFzMdG6YWZq9gWmV6ZxsrriFPCiDG6vZQINkslcSTW+b80opPEzZkhZ7lDu
+            SKwJPNkUIChi6x7X+O+UJSwfIhNWJVsooqPt2VHjTkEVOuESLY1P1xcCgYEAnIxe
+            np5xvKS8dytzIF1Ucc/m851Wj1MOS41yYUZN3LUteNfaa7719D90UeA+xZZR/rTc
+            EzO3e5NUbYCu6Yt/vW8Dh2EFw8nUJQ5sAN/f1brMDvITKQf2qAFgU93hfwbr8ftR
+            xAZaAGC5QTylyao56xYSj8lh1kZ3GVFzp5ixFrMCgYEA61i/AHjwpqoDTb05hSDt
+            U88xuqm4levap4fs+H60lkGTYIwZc9qt03JzVLklSCwF8thwlzcAG4AXMWyo9dHY
+            b7uNYz7Y5G/oKoaj7KqbCTaMCn9AJzs7VHuTyNPFAWkBFmZ7KFU7PpsP/1H+PIvB
+            3exqx+BqQQ/pa9oGTBBnCtkCgYEAmUX+JkNvjImmVO9fquJ2GXC66O61n2JsbqCw
+            ynjxJxTkzppYqoGvglLWaouqKf7BjSY7Cznpfb6EPSpvFw6UJT8aL2RZJpbndNin
+            +js3hqV7wW5WQCgh4eBnFfX6IEsAnE26grjNSe1ptGvSzp4yUu+rgMhlWExps4pC
+            OGeRi20CgYEA0frAtQsEVXFFl9V8fMdLT9fI89BCau1aseHXbNt5xzn6X72O+UX5
+            DPmVvKgs4SL0jHBizJnXJmJ8tVjf+R7cYeFpY74wuYbSu/4A8NZnxDpMlOxXnuva
+            Gc3+Hhqsk7EgdkdNjP0EzLh+iLs7B+BbqKDpFInOkMmC8v9/le8QqX4=
+            -----END RSA PRIVATE KEY-----
         run: |
           echo "$EC2_KEY" > ec2-key.pem
           chmod 400 ec2-key.pem
-          scp -i ec2-key.pem target/your-springboot-app.war $EC2_USER@$EC2_HOST:/home/$EC2_USER/
-          ssh -i ec2-key.pem $EC2_USER@$EC2_HOST <<EOF
+          scp -o StrictHostKeyChecking=no -i ec2-key.pem target/your-springboot-app.war $EC2_USER@$EC2_HOST:/home/$EC2_USER/
+          ssh -o StrictHostKeyChecking=no -i ec2-key.pem $EC2_USER@$EC2_HOST <<EOF
             sudo mv /home/$EC2_USER/your-springboot-app.war /var/lib/tomcat/webapps/
             sudo systemctl restart tomcat
           EOF
