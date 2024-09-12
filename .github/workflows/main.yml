@@ -22,6 +22,9 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
+      - name: Verify WAR File Exists
+        run: ls -l target/
+
       - name: Deploy WAR to EC2
         env:
           EC2_HOST: "54.163.15.193"  # Your EC2 instance public IP
